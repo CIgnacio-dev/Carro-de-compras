@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <title>Shop</title>
+</head>
+<body>
+    <div class="nav-bar">
+    <div id="app">
+        <div class="product">
+        <img 
+        v-bind:src="product.colors[0].img"
+        class="img" />
+
+     <div class="details" >
+         <h1> {{ product.name }}</h1>
+         <hr/>
+
+         <span
+         v-if="product.quantity > 50"
+          class="stock in-stock">
+             En stock.
+         </span>
+         <span
+         v-else-if="product.quantity > 0 && product.quantity < 50" 
+         class="stock low-stock">
+            Pocas unidades disponibles.
+        </span>
+        <span 
+        v-else
+        class="stock no-stock">
+            Sin stock.
+        </span>
+        <div class="colors">
+            <span
+            v-for="color in product.colors"
+            v-bind:title="color.name"
+            v-bind:style=" {backgroundColor: color.code }"
+            class="color-box">
+            </span>
+        </div>
+    </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="index.js"></script>
+
+</body>
+</html>
