@@ -1,5 +1,138 @@
+const navBar= Vue.component('nav-bar', {
+    template:`
+        <div class="nav-bar">
+            <div class="cart">
+            <img src="./src/assets/cart.png"/>
+            <span class="amount">{{ cartAmount }}</span>
+            <span class="descripcion">Cart</span>
+            </div>
+        </div>
+        `,
+    props:{
+        cartAmount: Number,
+    },
+})
+const leftColumn = Vue.component('left-column',{
+    template:`
+    <div class="left-column">
+                <div class="sidebar-img">
+                    <img
+                    v-for="(img, index) in images"
+                    :src="img"
+                    :class="{ 'side-img': true, 'img-selected': index === selectedImageIndex }"
+                    @mouseenter="selectImage(index)"/>
+                
+                <img 
+        :src="selectedProductImg"
+                class="img" />
+                </div>
+            </div>
+            `,
+            props: {
+                images: Array,
+                selectedImageIndex: Number,
+                selectedProductImg: String,
+            },
+            methods: {
+                selectImage(index){
+                    this.$emit('select-image',  index )
+                   
+                },
+            }
+})
+const centerColumn = Vue.component('center-column', {
+    template:`
+    <div class="center-column">
+     <div class="details" >
+         <h1> {{ product.name }}</h1>
+         <hr/>
+
+         <span
+         v-if="selectedProduct.cantidad > 50"
+          class="stock in-stock">
+             En stock.
+         </span>
+         <span
+         v-else-if="selectedProduct.cantidad > 0 && selectedProduct.cantidad< 50" 
+         class="stock low-stock">
+            Pocas unidades disponibles.
+        </span>
+        <span 
+        v-else
+        class="stock no-stock">
+            Sin stock.
+        </span>
+
+        <span>Model: <h3><b>{{ selectedProduct.name }}</b></h3></span>
+        <div class="colors">
+            <span
+            v-for="model in product.models"
+            v-bind:key="model.id"
+            v-bind:title="model.name"
+            v-bind:style=" {backgroundColor: model.color }"
+            v-bind:class="{ 'color-box' : true, 'color-selected': selectedProduct.id === model.id }"
+            @click="selectProduct(model.id)"
+            @mouseenter="setPreviewModel(model.id)"
+           
+            >
+            </span>
+        </div>
+        <ul class="descripcion">
+            <li v-for="descripcion in selectedProduct.descripcion">
+                {{ descripcion }}
+            </li>
+        </ul>
+    </div>
+</div>
+`,
+props:{
+    product: Object,
+    selectedProduct: Object,
+},
+methods:{
+    selectProduct(modelId){
+        this.$emit('select-product',  modelId )
+        this.selectedProductId = modelId
+        this.selectedImageIndex = 0
+},
+    setPreviewModel(modelId){
+        this.$emit('set-preview-model',  modelId )
+        this.previewProductId = modelId
+    },
+    clearPreviewModel(){
+        this.$emit('clear-preview-model' )
+        this.previewProductId = undefined
+    },
+}
+})
+const rightColumn= Vue.component('right-column',{
+    template: `
+    <div class="rigth-column">
+    <button
+    class="add-to-cart"
+    v-show="this.selectedProduct.cantidad > 0"
+    @click="addToCart">
+    Agregar al carrito</button>
+</div>
+    `,
+    props: {
+        selectedProduct: Object,
+
+    },
+    methods:{
+        addToCart(){
+            this.$emit('add-to-cart', this.selectedProduct )
+        }
+    }
+})
 const app = new Vue({
     el: '#app',
+    components:{
+        navBar,
+        leftColumn,
+        centerColumn,
+        rightColumn,
+    },
     data: {
         selectedProductId: undefined,
         previewProductId: undefined,
@@ -71,10 +204,12 @@ const app = new Vue({
         },
         selectImage(index){
             this.selectedImageIndex = index
+           
         },
-        addToCart(){
-            if (this.selectedProduct.cantidad >0){
-                this.cart.push(this.selectedProduct)
+       
+        addToCart(selectedProduct){
+            if (selectedProduct.cantidad >0){
+                this.cart.push(selectedProduct)
             }
         },
         
