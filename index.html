@@ -6,25 +6,42 @@
     <link rel="stylesheet" type="text/css" href="index.css">
     <title>Shop</title>
 </head>
-<body>
-    <div class="nav-bar">
-    <div id="app">
-        <div class="product">
-        <img 
-        v-bind:src="product.selected.img"
-        class="img" />
 
+<body>
+    <div id="app">
+    <div class="nav-bar">
+        <div class="cart">
+        <img src="./src/assets/cart.png">
+        <span class="amount">{{ cartAmount }}</span>
+        <span class="descripcion">Cart</span>
+        </div>
+    </div>
+        <div class="product">
+            <div class="left-column">
+                <div class="sidebar-img">
+                    <img
+                    v-for="(img, index) in selectedProduct.images"
+                    :src="img"
+                    :class="{ 'side-img': true, 'img-selected': index === selectedImageIndex }"
+                    @mouseenter="selectImage(index)"/>
+                
+                <img 
+        :src="selectedProductImg"
+                class="img" />
+                </div>
+            </div>
+    <div class="center-column">
      <div class="details" >
          <h1> {{ product.name }}</h1>
          <hr/>
 
          <span
-         v-if="product.selected.cantidad > 50"
+         v-if="selectedProduct.cantidad > 50"
           class="stock in-stock">
              En stock.
          </span>
          <span
-         v-else-if="product.selected-cantidad > 0 && product.selected.cantidad< 50" 
+         v-else-if="selectedProduct.cantidad > 0 && selectedProduct.cantidad< 50" 
          class="stock low-stock">
             Pocas unidades disponibles.
         </span>
@@ -33,19 +50,37 @@
         class="stock no-stock">
             Sin stock.
         </span>
-        <span>Select model:</span>
+
+        <span>Model: <h3><b>{{ selectedProduct.name }}</b></h3></span>
         <div class="colors">
             <span
             v-for="model in product.models"
             v-bind:key="model.id"
             v-bind:title="model.name"
             v-bind:style=" {backgroundColor: model.color }"
-            v-bind:class="{ 'color-box' : true, 'color-selected': product.selected.id === model.id }"
-            v-on:click="product.selected = model"
+            v-bind:class="{ 'color-box' : true, 'color-selected': selectedProduct.id === model.id }"
+            @click="selectProduct(model.id)"
+            @mouseenter="setPreviewModel(model.id)"
+           
             >
             </span>
         </div>
+        <ul class="descripcion">
+            <li v-for="descripcion in selectedProduct.descripcion">
+                {{ descripcion }}
+            </li>
+        </ul>
     </div>
+</div>
+
+    <div class="rigth-column">
+        <button
+        class="add-to-cart"
+        v-show="this.selectedProduct.cantidad > 0"
+        @click="addToCart">
+        Agregar al carrito</button>
+    </div>
+
 </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="index.js"></script>
